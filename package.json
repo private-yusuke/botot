@@ -1,7 +1,7 @@
 {
   "name": "botot",
   "version": "1.0.0",
-  "description": "",
+  "description": "A chatbot for Misskey with Markov chain",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
