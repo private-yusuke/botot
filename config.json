@@ -1,0 +1,4 @@
+{
+    "baseURL": "https://misskey.xyz",
+    "wsURL": "wss://misskey.xyz"
+}
