@@ -8,7 +8,7 @@
         "duration": [30, "minute"]
     },
     "mecab": {
-        "commandOptions": ""
-    }
+        "commandOptions": "-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/"
+    },
     "visibility": "home"
 }
