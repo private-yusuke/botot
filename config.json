@@ -1,4 +1,5 @@
 {
     "baseURL": "https://misskey.xyz",
-    "wsURL": "wss://misskey.xyz"
+    "wsURL": "wss://misskey.xyz",
+    "databasePath": "triplets_db.json"
 }

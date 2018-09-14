@@ -71,3 +71,6 @@ typings/
 
 # Serverless directories
 .serverless
+
+token.json
+triplets_db.json
