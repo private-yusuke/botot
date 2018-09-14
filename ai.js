@@ -19,6 +19,7 @@ class Ai {
     this.config = config
     this.unsavedPostCount = 0
     this.markov = new MarkovJa()
+    this.markov.mecab.commandOptions = this.config.mecab.commandOptions
     this.interrupted = false
     this.database = Database.create(config.database.type, this.markov, this.config)
     this.database.load()

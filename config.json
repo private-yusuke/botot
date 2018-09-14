@@ -7,5 +7,8 @@
         "saveFrequency": 10,
         "duration": [30, "minute"]
     },
+    "mecab": {
+        "commandOptions": ""
+    }
     "visibility": "home"
 }
