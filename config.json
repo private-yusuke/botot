@@ -1,5 +1,6 @@
 {
     "baseURL": "https://misskey.xyz",
     "wsURL": "wss://misskey.xyz",
-    "databasePath": "triplets_db.json"
+    "databasePath": "triplets_db.json",
+    "saveFrequency": 10
 }

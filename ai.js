@@ -11,10 +11,12 @@ const fetch = require('node-fetch')
  * @prop {MarcovJa} markov マルコフ連鎖をするためのインスタンス。
  * @prop {object} config 接続先インスタンスなどの設定。
  * @prop {conn} conn 接続。
+ * @prop {number} unsavedPostCount this.config.saveFrequency 回の投稿ごとに、データベースに保存します。
  */
 class Ai {
   constructor (config) {
     this.config = config
+    this.unsavedPostCount = 0
     this.markov = new MarkovJa()
     try {
       this.markov.loadDatabase(fs.readFileSync(this.config.databasePath), 'utf-8')
@@ -24,7 +26,7 @@ class Ai {
   }
   api (endpoint, body = {}) {
     let url = `${this.config.apiURL}/${endpoint}`
-    console.log('calling', url)
+    // console.log('calling', url)
     return fetch(url, {
       method: 'POST',
       body: JSON.stringify(Object.assign({
@@ -34,7 +36,12 @@ class Ai {
   onMessage (msg, isDM) {
     if (msg.type === 'note' && msg.body.userId !== this.me.id) {
       this.markov.learn((msg.body.text || '').replace(/(@.+)?\s/, ''))
-      fs.writeFileSync(this.config.databasePath, this.markov.exportDatabase(), 'utf-8')
+      if (this.unsavedPostCount >= this.config.saveFrequency) {
+        this.unsavedPostCount = 0
+        fs.writeFile(this.config.databasePath, this.markov.exportDatabase(), 'utf-8', function () {
+          console.log('database successfully saved')          
+        })
+      } else this.unsavedPostCount++
 
       console.log(`${msg.body.user.name}(@${msg.body.user.username}): ${msg.body.text}`)
 
@@ -63,9 +70,7 @@ class Ai {
   }
   async onMention (body, isDM) {
     // 他人へのリプライとなる @…… の部分は削除します。
-    var text = body.text.replace(/(@.+)?\s/, '')
-    console.log(text)
-    this.markov.learn(text)
+    let text = body.text.replace(/(@.+)?\s/, '')
     if (isDM) {
 
     } else {
@@ -73,7 +78,7 @@ class Ai {
       // console.log(body.id)
       let res = await this.api('notes/create', { replyId: body.id, text: this.markov.generate(2).join('\n') })
       // console.log(res)
-      let rest = await res.text()
+      let resText = await res.text()
       // console.log(rest)
     }
   }
