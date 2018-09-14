@@ -54,6 +54,7 @@ class Ai {
     var res = await this.api('i')
     var text = await res.text()
     this.me = JSON.parse(text)
+    if (this.me.error) throw new Error(this.me.error)
     console.log(`I am ${this.me.name}(@${this.me.username}), whose id is ${this.me.id}.`)
 
     // #region Timeline
