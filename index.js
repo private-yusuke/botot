@@ -16,8 +16,4 @@ process.on('SIGINT', function () {
   console.log('Caught interrupt signal, killing myself…')
   ai.onInterrupt()
 })
-process.on('SIGKILL', function () {
-  console.log('get killed by another process! shutting down...')
-  ai.onInterrupt()
-})
 main()
