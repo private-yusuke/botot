@@ -1,6 +1,11 @@
 {
     "baseURL": "https://misskey.xyz",
     "wsURL": "wss://misskey.xyz",
-    "databasePath": "triplets_db.json",
-    "saveFrequency": 10
+    "database": {
+        "path": "db/triplets_db.json",
+        "type": "flexible",
+        "saveFrequency": 10,
+        "duration": [30, "minute"]
+    },
+    "visibility": "home"
 }

@@ -1,29 +1,29 @@
-// const WebSocket = require('ws')
-const WebSocketClient = require('websocket').client
+// const WebSocketClient = require('websocket').client
 const fs = require('fs')
-var client = new WebSocketClient()
-const uuid = require('uuid/v4')
+const WebSocket = require('ws')
+const ReconnectingWebSocket = require('./node_modules/reconnecting-websocket/dist/reconnecting-websocket-cjs')
+// const uuid = require('uuid/v4')
 const MarkovJa = require('markov-ja')
 const fetch = require('node-fetch')
+const Database = require('./database/index.js')
 
 /**
  * @prop {User} me このbotのユーザー情報。
  * @prop {MarcovJa} markov マルコフ連鎖をするためのインスタンス。
  * @prop {object} config 接続先インスタンスなどの設定。
- * @prop {conn} conn 接続。
- * @prop {number} unsavedPostCount this.config.saveFrequency 回の投稿ごとに、データベースに保存します。
+ * @prop {conn} connection WebSocketのタイムラインへの接続。
+ * @prop {bool} interrupted botを中断するべきか否かのフラグ。
  */
 class Ai {
   constructor (config) {
     this.config = config
     this.unsavedPostCount = 0
     this.markov = new MarkovJa()
-    try {
-      this.markov.loadDatabase(fs.readFileSync(this.config.databasePath), 'utf-8')
-    } catch (e) {
-      this.markov.loadDatabase('{}')
-    }
+    this.interrupted = false
+    this.database = Database.create(config.database.type, this.markov, this.config)
+    this.database.load()
   }
+
   api (endpoint, body = {}) {
     let url = `${this.config.apiURL}/${endpoint}`
     // console.log('calling', url)
@@ -33,15 +33,13 @@ class Ai {
         'i': this.config.token
       }, body)) })
   }
+
   onMessage (msg, isDM) {
-    if (msg.type === 'note' && msg.body.userId !== this.me.id) {
+    // console.log('onMessage')
+    if (msg.type === 'note' && msg.body.userId !== this.me.id &&
+      !msg.body.user.isBot) {
       this.markov.learn((msg.body.text || '').replace(/(@.+)?\s/, ''))
-      if (this.unsavedPostCount >= this.config.saveFrequency) {
-        this.unsavedPostCount = 0
-        fs.writeFile(this.config.databasePath, this.markov.exportDatabase(), 'utf-8', function () {
-          console.log('database successfully saved')          
-        })
-      } else this.unsavedPostCount++
+      this.database.databaseSync()
 
       console.log(`${msg.body.user.name}(@${msg.body.user.username}): ${msg.body.text}`)
 
@@ -57,34 +55,54 @@ class Ai {
     this.me = JSON.parse(text)
     console.log(`I am ${this.me.name}(@${this.me.username}), whose id is ${this.me.id}.`)
 
-    client.on('connect', conn => {
-      this.conn = conn
-      console.log('connected!', Date())
-
-      conn.on('message', message => {
-        var msg = JSON.parse(message.utf8Data)
-        this.onMessage(msg, false)
-      })
+    // #region Timeline
+    this.connection = new ReconnectingWebSocket(`${this.config.wsURL}/hybrid-timeline?i=${this.config.token}`, [], {
+      WebSocket: WebSocket
     })
-    client.connect(`${this.config.wsURL}/hybrid-timeline?i=${this.config.token}`)
+    this.connection.addEventListener('open', () => {
+      console.log('connected!', Date())
+    })
+    this.connection.addEventListener('close', () => {
+      console.log('disconnedted!', Date())
+      if (!this.interrupted) this.connection.reconnect()
+    })
+    this.connection.addEventListener('message', message => {
+      let msg = JSON.parse(message.data)
+
+      this.onMessage(msg, false)
+    })
+    // #endregion
   }
   async onMention (body, isDM) {
+    // console.log('onMention')
     // 他人へのリプライとなる @…… の部分は削除します。
     let text = body.text.replace(/(@.+)?\s/, '')
     if (isDM) {
 
     } else {
+      // console.log('onMention - else')
       // console.log(body)
       // console.log(body.id)
-      let res = await this.api('notes/create', { replyId: body.id, text: this.markov.generate(2).join('\n') })
+      let speech
+      try {
+        speech = this.markov.generate(this.config.sentenceLength || 2).join('\n')
+      } catch (e) {
+        speech = '...'
+      }
+      let res = await this.api('notes/create', {
+        replyId: body.id,
+        text: speech,
+        visibility: this.config.visibility
+      })
       // console.log(res)
       let resText = await res.text()
-      // console.log(rest)
+      // console.log(resText)
     }
   }
   onInterrupt () {
-    this.conn.close()
-    fs.writeFileSync(this.config.databasePath, this.markov.exportDatabase(), 'utf-8')
+    this.interrupted = true
+    this.connection.close()
+    this.database.save()
   }
 }
 
