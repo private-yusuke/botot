@@ -75,6 +75,18 @@ class Ai {
     })
     // #endregion
   }
+  sentenceLength () {
+    function getRandomInt (max) {
+      return Math.floor(Math.random() * Math.floor(max))
+    }
+    if (this.config.sentenceLength) return this.config.sentenceLength
+    else if (this.config.sentenceLengthRange) {
+      let l = this.config.sentenceLengthRange[0]
+      let r = this.config.sentenceLengthRange[1]
+      let m = r - l
+      return getRandomInt(m + 1) + l
+    }
+  }
   async onMention (body, isDM) {
     // console.log('onMention')
     // 他人へのリプライとなる @…… の部分は削除します。
@@ -87,7 +99,7 @@ class Ai {
       // console.log(body.id)
       let speech
       try {
-        speech = this.markov.generate(this.config.sentenceLength || 2).join('\n')
+        speech = this.markov.generate(this.sentenceLength()).join('\n')
       } catch (e) {
         speech = '...'
       }

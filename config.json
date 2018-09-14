@@ -7,6 +7,7 @@
         "saveFrequency": 10,
         "duration": [30, "minute"]
     },
+    "sentenceLengthRange": [2, 5],
     "mecab": {
         "commandOptions": "-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/"
     },
