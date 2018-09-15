@@ -2,6 +2,8 @@
   "baseURL": "https://misskey.xyz",
   "wsURL": "wss://misskey.xyz",
   "timeline": "social",
+  "intervalPost": true,
+  "intervalPostDuration": [10, "minute"],
   "database": {
       "path": "db/triplets_db.json",
       "type": "flexible",

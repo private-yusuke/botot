@@ -1,6 +1,7 @@
 // const WebSocketClient = require('websocket').client
 const fs = require('fs')
 const WebSocket = require('ws')
+const moment = require('moment')
 const ReconnectingWebSocket = require('./node_modules/reconnecting-websocket/dist/reconnecting-websocket-cjs')
 // const uuid = require('uuid/v4')
 const MarkovJa = require('markov-ja')
@@ -23,6 +24,23 @@ class Ai {
     this.interrupted = false
     this.database = Database.create(config.database.type, this.markov, this.config)
     this.database.load()
+
+    if (this.config.intervalPost) {
+      let duration = this.config.intervalPostDuration
+      this.intervalObj = setInterval(async () => {
+        let text = this.markov.generate(this.sentenceLength()).join('\n')
+        let res = await this.api('notes/create', {
+          text: text
+        })
+        let resText = await res.text()
+        let json = JSON.parse(resText)
+        if (json.error) {
+          console.log(json.error)
+        } else {
+          console.log('successfully posted on setInterval')
+        }
+      }, moment.duration(duration[0], duration[1]))
+    }
   }
 
   api (endpoint, body = {}) {
@@ -117,6 +135,7 @@ class Ai {
     this.interrupted = true
     this.connection.close()
     this.database.save()
+    clearInterval(this.intervalObj)
   }
 }
 
