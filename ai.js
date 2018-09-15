@@ -58,11 +58,11 @@ class Ai {
     console.log(`I am ${this.me.name}(@${this.me.username}), whose id is ${this.me.id}.`)
 
     // #region Timeline
-    this.connection = new ReconnectingWebSocket(`${this.config.wsURL}/hybrid-timeline?i=${this.config.token}`, [], {
+    this.connection = new ReconnectingWebSocket(this.config.timelineURL, [], {
       WebSocket: WebSocket
     })
     this.connection.addEventListener('open', () => {
-      console.log('connected!', Date())
+      console.log('connected!:', this.config.timeline, Date())
     })
     this.connection.addEventListener('close', () => {
       console.log('disconnedted!', Date())

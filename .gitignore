@@ -75,3 +75,4 @@ typings/
 token.json
 triplets_db.json
 db/*
+config.json
