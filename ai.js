@@ -28,7 +28,12 @@ class Ai {
     if (this.config.intervalPost) {
       let duration = this.config.intervalPostDuration
       this.intervalObj = setInterval(async () => {
-        let text = this.markov.generate(this.sentenceLength()).join('\n')
+        let text = ''
+        if (!this.connection) {
+          await this.initSocket()
+          text += '[WebSocket revived]\n'
+        }
+        text += this.markov.generate(this.sentenceLength()).join('\n')
         let res = await this.api('notes/create', {
           text: text
         })
@@ -75,7 +80,10 @@ class Ai {
     if (this.me.error) throw new Error(this.me.error)
     console.log(`I am ${this.me.name}(@${this.me.username}), whose id is ${this.me.id}.`)
 
-    // #region Timeline
+    this.initSocket()
+    // #endregion
+  }
+  async initSocket () {
     this.connection = new ReconnectingWebSocket(this.config.timelineURL, [], {
       WebSocket: WebSocket
     })
@@ -83,7 +91,7 @@ class Ai {
       console.log('connected!:', this.config.timeline, Date())
     })
     this.connection.addEventListener('close', () => {
-      console.log('disconnedted!', Date())
+      // console.log('disconnedted!', Date())
       if (!this.interrupted) this.connection.reconnect()
     })
     this.connection.addEventListener('message', message => {
@@ -91,7 +99,6 @@ class Ai {
 
       this.onMessage(msg, false)
     })
-    // #endregion
   }
   sentenceLength () {
     function getRandomInt (max) {
