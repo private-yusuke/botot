@@ -1,18 +1,20 @@
 {
-  "baseURL": "https://misskey.xyz",
-  "wsURL": "wss://misskey.xyz",
-  "timeline": "social",
-  "intervalPost": true,
-  "intervalPostDuration": [10, "minute"],
-  "database": {
-      "path": "db/triplets_db.json",
-      "type": "flexible",
-      "saveFrequency": 10,
-      "duration": [30, "minute"]
-  },
-  "sentenceLengthRange": [2, 5],
-  "mecab": {
-      "commandOptions": "-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/"
-  },
-  "visibility": "home"
-}
+    "baseURL": "https://misskey.xyz",
+    "wsURL": "wss://misskey.xyz",
+    "timeline": "social",
+    "intervalPost": true,
+    "intervalPostDuration": [10, "minute"],
+    "database": {
+        "path": "db/triplets_db.json",
+        "type": "flexible",
+        "saveFrequency": 10,
+        "duration": [30, "minute"],
+  
+        "maxSize": 50e6
+    },
+    "sentenceLengthRange": [2, 5],
+    "mecab": {
+        "commandOptions": "-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/"
+    },
+    "visibility": "home"
+  }
