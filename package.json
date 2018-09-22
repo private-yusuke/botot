@@ -14,7 +14,7 @@
     "node-fetch": "^2.2.0",
     "reconnecting-websocket": "^4.0.0-rc5",
     "uuid": "^3.3.2",
-    "websocket": "^1.0.26",
+    "websocket": "^1.0.28",
     "ws": "^6.0.0"
   },
   "devDependencies": {
