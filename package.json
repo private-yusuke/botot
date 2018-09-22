@@ -9,7 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "markov-ja": "^1.0.4",
+    "markov-ja": "^1.0.6",
     "moment": "^2.22.2",
     "node-fetch": "^2.2.0",
     "reconnecting-websocket": "^4.0.0-rc5",
