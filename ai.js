@@ -33,7 +33,7 @@ class Ai {
           await this.initSocket()
           text += '[WebSocket revived]\n'
           console.log('connection revived!')
-        } else this.connection.reconnect()
+        }
         text += this.markov.generate(this.sentenceLength()).join('\n')
         let res = await this.api('notes/create', {
           text: text
