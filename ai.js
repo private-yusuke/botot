@@ -64,8 +64,8 @@ class Ai {
       console.log(`${msg.body.user.name}(@${msg.body.user.username}): ${msg.body.text}`)
 
       // 自分が送信したものには反応しません。また、自分へのリプライでないと反応しません。
-      console.log(msg.body.reply)
-      if ((msg.body.text || '').indexOf(`@${this.me.username}`) >= 0 || msg.body.reply.userId === this.me.id) {
+      let reply = msg.body.reply || { userId: 'noone' }
+      if ((msg.body.text || '').indexOf(`@${this.me.username}`) >= 0 || reply.userId === this.me.id) {
         await this.onMention(msg.body, isDM)
       }
     }
