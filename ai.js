@@ -1,5 +1,4 @@
 // const WebSocketClient = require('websocket').client
-const fs = require('fs')
 const WebSocket = require('ws')
 const moment = require('moment')
 const ReconnectingWebSocket = require('./node_modules/reconnecting-websocket/dist/reconnecting-websocket-cjs')
@@ -29,11 +28,7 @@ class Ai {
       let duration = this.config.intervalPostDuration
       this.intervalObj = setInterval(async () => {
         let text = ''
-        if (!this.connection) {
-          await this.initSocket()
-          text += '[WebSocket revived]\n'
-          console.log('connection revived!')
-        }
+        this.initSocket()
         text += this.markov.generate(this.sentenceLength()).join('\n')
         let res = await this.api('notes/create', {
           text: text
@@ -85,6 +80,7 @@ class Ai {
     // #endregion
   }
   async initSocket () {
+    if (this.connection) this.connection.close()
     this.connection = new ReconnectingWebSocket(this.config.timelineURL, [], {
       WebSocket: WebSocket
     })
@@ -116,7 +112,7 @@ class Ai {
   async onMention (body, isDM) {
     // console.log('onMention')
     // 他人へのリプライとなる @…… の部分は削除します。
-    let text = body.text.replace(/(@.+)?\s/, '')
+    // let text = body.text.replace(/(@.+)?\s/, '')
     if (isDM) {
 
     } else {
@@ -129,14 +125,11 @@ class Ai {
       } catch (e) {
         speech = '...'
       }
-      let res = await this.api('notes/create', {
+      await this.api('notes/create', {
         replyId: body.id,
         text: speech,
         visibility: this.config.visibility
       })
-      // console.log(res)
-      let resText = await res.text()
-      // console.log(resText)
     }
   }
   onInterrupt () {
