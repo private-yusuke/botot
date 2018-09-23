@@ -54,7 +54,7 @@ class Ai {
       }, body)) })
   }
 
-  onMessage (msg, isDM) {
+  async onMessage (msg, isDM) {
     // console.log('onMessage')
     if (msg.type === 'note' && msg.body.userId !== this.me.id &&
       !msg.body.user.isBot) {
@@ -64,8 +64,9 @@ class Ai {
       console.log(`${msg.body.user.name}(@${msg.body.user.username}): ${msg.body.text}`)
 
       // 自分が送信したものには反応しません。また、自分へのリプライでないと反応しません。
-      if ((msg.body.text || '').indexOf(`@${this.me.username}`) >= 0) {
-        this.onMention(msg.body, isDM)
+      console.log(msg.body.reply)
+      if ((msg.body.text || '').indexOf(`@${this.me.username}`) >= 0 || msg.body.reply.userId === this.me.id) {
+        await this.onMention(msg.body, isDM)
       }
     }
   }
@@ -91,10 +92,10 @@ class Ai {
       // console.log('disconnedted!', Date())
       if (!this.interrupted) this.connection.reconnect()
     })
-    this.connection.addEventListener('message', message => {
+    this.connection.addEventListener('message', async message => {
       let msg = JSON.parse(message.data)
 
-      this.onMessage(msg, false)
+      await this.onMessage(msg, false)
     })
   }
   sentenceLength () {
