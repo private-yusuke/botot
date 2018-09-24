@@ -30,8 +30,8 @@ let ai = new Ai(config)
 async function main () {
   await ai.init()
 }
-process.on('SIGINT', function () {
+process.on('SIGINT', async function () {
   console.log('Caught interrupt signal, killing myself…')
-  ai.onInterrupt()
+  await ai.onInterrupt()
 })
 main()

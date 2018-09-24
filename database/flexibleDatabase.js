@@ -30,9 +30,8 @@ class FlexibleDatabase {
     this.markov.loadDatabase('{}')
   }
   save () {
-    fs.writeFile(this.config.database.path, this.markov.exportDatabase(), 'utf-8', function () {
-      console.log('database successfully saved')
-    })
+    fs.writeFileSync(this.config.database.path, this.markov.exportDatabase(), 'utf-8')
+    console.log('database successfully saved')
   }
 }
 

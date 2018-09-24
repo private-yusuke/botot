@@ -27,9 +27,7 @@ class OnlyOneDatabase {
     }
   }
   save () {
-    fs.writeFile(this.config.database.path, this.markov.exportDatabase(), 'utf-8', function () {
-      console.log('database successfully saved')
-    })
+    fs.writeFileSync(this.config.database.path, this.markov.exportDatabase(), 'utf-8')
     if (this.config.database.maxSize !== 0) {
       const size = fs.statSync(this.config.database.path).size
       if (size >= this.config.database.maxSize) {

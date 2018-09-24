@@ -135,7 +135,7 @@ class Ai {
       })
     }
   }
-  onInterrupt () {
+  async onInterrupt () {
     this.interrupted = true
     this.connection.close()
     this.database.save()
