@@ -23,12 +23,14 @@ class Ai {
     this.interrupted = false
     this.database = Database.create(config.database.type, this.markov, this.config)
     this.database.load()
-
+    let webSocketInterval = this.config.webSocketRefreshDuration
+    this.webSocketIntervalObj = setInterval(async () => {
+      this.initSocket()
+    }, moment.duration(webSocketInterval[0], webSocketInterval[1]))
     if (this.config.intervalPost) {
       let duration = this.config.intervalPostDuration
       this.intervalObj = setInterval(async () => {
         let text = ''
-        this.initSocket()
         text += this.markov.generate(this.sentenceLength()).join('\n')
         let res = await this.api('notes/create', {
           text: text
