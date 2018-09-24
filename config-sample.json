@@ -3,8 +3,12 @@
     "wsURL": "wss://misskey.xyz",
     "timeline": "social",
     "intervalPost": true,
+<<<<<<< HEAD
     "intervalPostDuration": [10, "minute"],
     "webSocketRefreshDuration": [10, "minute"],
+=======
+    "intervalPostDuration": [1, "hour"],
+>>>>>>> 9db59baafead685b1f9c659b3df76d7ece6fb59c
     "database": {
         "path": "db/triplets_db.json",
         "type": "flexible",
@@ -15,7 +19,7 @@
     },
     "sentenceLengthRange": [2, 5],
     "mecab": {
-        "commandOptions": "-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/"
+        "commandOptions": ""
     },
-    "visibility": "home"
+    "visibility": "followers"
   }
