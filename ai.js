@@ -140,6 +140,8 @@ class Ai {
     this.connection.close()
     this.database.save()
     clearInterval(this.intervalObj)
+    clearInterval(this.webSocketIntervalObj)
+    process.exit(0)
   }
 }
 
